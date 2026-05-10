@@ -1,0 +1,25 @@
+import { CookieOptions, Response } from 'express';
+import { env } from 'src/config/env.config';
+
+const baseCookieOptions = (): CookieOptions => ({
+  httpOnly: true,
+  secure: env.NODE_ENV === 'production',
+  sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax',
+  maxAge: 1000 * 60 * 60 * 24 * 7,
+});
+
+export const setCookie = (
+  res: Response,
+  name: string,
+  value: string,
+  options?: CookieOptions,
+) => {
+  res.cookie(name, value, {
+    ...baseCookieOptions(),
+    ...options,
+  });
+};
+
+export const clearCookie = (res: Response, name: string) => {
+  res.clearCookie(name, baseCookieOptions());
+};

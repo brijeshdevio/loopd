@@ -1,8 +1,11 @@
-import { Body, Controller, Post, UsePipes } from '@nestjs/common';
+import { Body, Controller, Post, Res, UsePipes } from '@nestjs/common';
+import { type Response } from 'express';
 import { apiResponse } from 'src/common/helper/api-response';
+import { setCookie } from 'src/common/helper/cookie';
 import { ValidationPipe } from 'src/common/pipes/validation.pipe';
 
 import { AuthService } from './auth.service';
+import { LoginDto, LoginSchema } from './dto/login.dto';
 import { RegisterDto, RegisterSchema } from './dto/register.dto';
 
 @Controller('auth')
@@ -14,5 +17,16 @@ export class AuthController {
   async register(@Body() data: RegisterDto) {
     const user = await this.authService.register(data);
     return apiResponse({ message: 'User registered successfully', data: user });
+  }
+
+  @Post('login')
+  @UsePipes(new ValidationPipe(LoginSchema))
+  async login(
+    @Body() data: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { accessToken } = await this.authService.login(data);
+    setCookie(res, 'accessToken', accessToken);
+    return apiResponse({ message: 'User logged in successfully' });
   }
 }

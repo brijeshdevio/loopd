@@ -21,3 +21,13 @@ Content-Type: application/json
   "shopName": "Raj Electronics",
   "shopCategory": "ELECTRONICS"
 }
+
+
+### Login user
+POST {{base_url}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "raj@rajelectronics.com",
+  "password": "Raj@12345"
+}
