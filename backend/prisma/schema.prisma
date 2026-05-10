@@ -1,0 +1,191 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum PlanType {
+  FREE_TRIAL
+  STANDARD
+  PRO
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+enum ShopCategory {
+  SALON
+  MEDICAL
+  GYM
+  RETAIL
+  ELECTRONICS
+  OTHER
+}
+
+enum FollowUpType {
+  CALL
+  MESSAGE
+  VISIT
+}
+
+enum FollowUpStatus {
+  PENDING
+  DONE
+  OVERDUE
+  RESCHEDULED
+  NO_RESPONSE
+}
+
+enum FollowUpPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+// ─────────────────────────────────────────
+// USER
+// ─────────────────────────────────────────
+
+model User {
+  id       String @id @default(cuid())
+  email    String @unique
+  password String
+
+  name         String
+  phone        String
+  shopName     String
+  shopCategory ShopCategory @default(OTHER)
+  role         UserRole     @default(USER)
+  avatarUrl    String?
+
+  emailVerified          Boolean   @default(false)
+  emailVerificationToken String?
+  emailVerifiedAt        DateTime?
+
+  passwordResetToken     String?
+  passwordResetExpiresAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  subscription Subscription?
+  customers    Customer[]
+  followUps    FollowUp[]
+
+  @@map("users")
+}
+
+// ─────────────────────────────────────────
+// SUBSCRIPTION
+// ─────────────────────────────────────────
+
+model Subscription {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  planType PlanType           @default(FREE_TRIAL)
+  status   SubscriptionStatus @default(ACTIVE)
+
+  trialStartedAt DateTime @default(now())
+  trialEndsAt    DateTime
+
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+
+  razorpayCustomerId     String?
+  razorpaySubscriptionId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}
+
+// ─────────────────────────────────────────
+// CUSTOMER
+// ─────────────────────────────────────────
+
+model Customer {
+  id      String @id @default(cuid())
+  ownerId String
+
+  name          String
+  phone         String
+  email         String?
+  lastVisitDate DateTime?
+  notes         String?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  owner     User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  followUps FollowUp[]
+
+  @@unique([ownerId, phone])
+  @@unique([ownerId, email])
+  @@index([ownerId])
+  @@index([ownerId, name])
+  @@index([ownerId, phone])
+  @@index([ownerId, isDeleted])
+  @@map("customers")
+}
+
+// ─────────────────────────────────────────
+// FOLLOW-UP
+// ─────────────────────────────────────────
+
+model FollowUp {
+  id         String @id @default(cuid())
+  customerId String
+  ownerId    String
+
+  type     FollowUpType     @default(CALL)
+  status   FollowUpStatus   @default(PENDING)
+  priority FollowUpPriority @default(MEDIUM)
+
+  scheduledAt DateTime
+  completedAt DateTime?
+
+  notes        String?
+  outcomeNotes String?
+
+  reminderOneDaySent  Boolean @default(false)
+  reminderOneHourSent Boolean @default(false)
+
+  parentFollowUpId String?
+  parentFollowUp   FollowUp?  @relation("FollowUpReschedule", fields: [parentFollowUpId], references: [id])
+  rescheduledTo    FollowUp[] @relation("FollowUpReschedule")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  owner    User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId, status])
+  @@index([ownerId, scheduledAt, status])
+  @@index([scheduledAt, reminderOneDaySent, reminderOneHourSent])
+  @@map("follow_ups")
+}

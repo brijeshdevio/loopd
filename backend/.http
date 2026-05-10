@@ -1,0 +1,9 @@
+@base_url = http://localhost:3000/api/v1
+
+
+### Root route
+GET  {{base_url}}/
+
+
+### Health route
+GET {{base_url}}/health
