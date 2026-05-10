@@ -7,3 +7,17 @@ GET  {{base_url}}/
 
 ### Health route
 GET {{base_url}}/health
+
+
+### Register user
+POST {{base_url}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Raj Kumar",
+  "email": "raj@rajelectronics.com",
+  "password": "Raj@12345",
+  "phone": "9876543210",
+  "shopName": "Raj Electronics",
+  "shopCategory": "ELECTRONICS"
+}
