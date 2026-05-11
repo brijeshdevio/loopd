@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Patch,
   Post,
   Res,
   UseGuards,
@@ -17,6 +18,10 @@ import { ValidationPipe } from 'src/common/pipes/validation.pipe';
 import { AuthService } from './auth.service';
 import { LoginDto, LoginSchema } from './dto/login.dto';
 import { RegisterDto, RegisterSchema } from './dto/register.dto';
+import {
+  UpdateProfileDto,
+  UpdateProfileSchema,
+} from './dto/update-profile.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -52,5 +57,15 @@ export class AuthController {
   async findUserById(@CurrentUser('id') userId: string) {
     const user = await this.authService.findUserById(userId);
     return apiResponse({ data: user });
+  }
+
+  @Patch('me')
+  @UseGuards(JwtAuthGuard)
+  async updateUserById(
+    @CurrentUser('id') userId: string,
+    @Body(new ValidationPipe(UpdateProfileSchema)) data: UpdateProfileDto,
+  ) {
+    const user = await this.authService.updateUserById(userId, data);
+    return apiResponse({ message: 'User updated successfully', data: user });
   }
 }

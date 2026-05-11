@@ -11,6 +11,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 export const DUMMY_HASH =
   '$argon2id$v=19$m=65536,t=3,p=4$/y1jJS2H1+mZ1Sg77uvgAg$AYsdfipeVFRQxT2zXSCaw6581/ZdUV1I1MOjlng0fCM';
@@ -101,5 +102,38 @@ export class AuthService {
     }
 
     return user;
+  }
+
+  async updateUserById(userId: string, data: UpdateProfileDto) {
+    try {
+      return await this.prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          ...data,
+        },
+        select: {
+          id: true,
+          name: true,
+          phone: true,
+          shopName: true,
+          shopCategory: true,
+          avatarUrl: true,
+        },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === PRISMA_CODES.CONFLICT) {
+          throw new ConflictException(`Phone number already exists.`);
+        }
+        if (error.code === PRISMA_CODES.NOT_FOUND) {
+          throw new UnauthorizedException(
+            'You are not logged in or your session has expired. Please log in again.',
+          );
+        }
+      }
+      throw error;
+    }
   }
 }
