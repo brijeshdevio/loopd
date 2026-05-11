@@ -75,4 +75,31 @@ export class AuthService {
       }),
     };
   }
+
+  async findUserById(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        shopName: true,
+        shopCategory: true,
+        avatarUrl: true,
+        emailVerified: true,
+        createdAt: true,
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException(
+        'You are not logged in or your session has expired. Please log in again.',
+      );
+    }
+
+    return user;
+  }
 }

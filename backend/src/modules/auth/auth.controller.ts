@@ -1,12 +1,14 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   Res,
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
 import { type Response } from 'express';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { apiResponse } from 'src/common/helper/api-response';
 import { clearCookie, setCookie } from 'src/common/helper/cookie';
@@ -43,5 +45,12 @@ export class AuthController {
   logout(@Res({ passthrough: true }) res: Response) {
     clearCookie(res, 'accessToken');
     return apiResponse({ message: 'User logged out successfully.' });
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  async findUserById(@CurrentUser('id') userId: string) {
+    const user = await this.authService.findUserById(userId);
+    return apiResponse({ data: user });
   }
 }
