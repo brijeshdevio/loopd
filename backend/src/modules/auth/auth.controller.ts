@@ -1,7 +1,15 @@
-import { Body, Controller, Post, Res, UsePipes } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Res,
+  UseGuards,
+  UsePipes,
+} from '@nestjs/common';
 import { type Response } from 'express';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { apiResponse } from 'src/common/helper/api-response';
-import { setCookie } from 'src/common/helper/cookie';
+import { clearCookie, setCookie } from 'src/common/helper/cookie';
 import { ValidationPipe } from 'src/common/pipes/validation.pipe';
 
 import { AuthService } from './auth.service';
@@ -28,5 +36,12 @@ export class AuthController {
     const { accessToken } = await this.authService.login(data);
     setCookie(res, 'accessToken', accessToken);
     return apiResponse({ message: 'User logged in successfully' });
+  }
+
+  @Post('logout')
+  @UseGuards(JwtAuthGuard)
+  logout(@Res({ passthrough: true }) res: Response) {
+    clearCookie(res, 'accessToken');
+    return apiResponse({ message: 'User logged out successfully.' });
   }
 }

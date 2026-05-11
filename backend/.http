@@ -31,3 +31,7 @@ Content-Type: application/json
   "email": "raj@rajelectronics.com",
   "password": "Raj@12345"
 }
+
+
+### Logout user
+POST {{base_url}}/auth/logout
