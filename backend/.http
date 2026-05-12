@@ -58,3 +58,7 @@ Content-Type: application/json
   "currentPassword": "Raj@12345",
   "newPassword": "NewRaj@99"
 }
+
+
+### Find customers
+GET {{base_url}}/customers
