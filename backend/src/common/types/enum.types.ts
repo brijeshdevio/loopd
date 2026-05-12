@@ -6,3 +6,15 @@ export enum ShopCategory {
   ELECTRONICS = 'ELECTRONICS',
   OTHER = 'OTHER',
 }
+
+export enum FollowUpType {
+  CALL = 'CALL',
+  MESSAGE = 'MESSAGE',
+  VISIT = 'VISIT',
+}
+
+export enum FollowUpPriority {
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  HIGH = 'HIGH',
+}

@@ -62,3 +62,22 @@ Content-Type: application/json
 
 ### Find customers
 GET {{base_url}}/customers
+
+
+### Add customer
+POST {{base_url}}/customers
+Content-Type: application/json
+
+{
+  "name": "Arjun Mehta",
+  "phone": "9812345678",
+  "email": "arjun@gmail.com",
+  "lastVisitDate": "2025-04-17",
+  "notes": "Interested in water purifier",
+  "followUp": {
+    "type": "CALL",
+    "scheduledAt": "2025-05-17T09:00:00.000Z",
+    "priority": "HIGH",
+    "notes": "Ask about purifier interest"
+  }
+}
