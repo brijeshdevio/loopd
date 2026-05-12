@@ -48,3 +48,13 @@ Content-Type: application/json
 {
   "shopName": "Raj Electronics & Co."
 }
+
+
+### Change password
+PATCH {{base_url}}/auth/change-password
+Content-Type: application/json
+
+{
+  "currentPassword": "Raj@12345",
+  "newPassword": "NewRaj@99"
+}

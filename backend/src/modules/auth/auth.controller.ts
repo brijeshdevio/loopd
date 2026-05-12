@@ -16,6 +16,10 @@ import { clearCookie, setCookie } from 'src/common/helper/cookie';
 import { ValidationPipe } from 'src/common/pipes/validation.pipe';
 
 import { AuthService } from './auth.service';
+import {
+  ChangePasswordDto,
+  ChangePasswordSchema,
+} from './dto/change-password.dto';
 import { LoginDto, LoginSchema } from './dto/login.dto';
 import { RegisterDto, RegisterSchema } from './dto/register.dto';
 import {
@@ -67,5 +71,17 @@ export class AuthController {
   ) {
     const user = await this.authService.updateUserById(userId, data);
     return apiResponse({ message: 'User updated successfully', data: user });
+  }
+
+  @Patch('change-password')
+  @UseGuards(JwtAuthGuard)
+  async changePassword(
+    @CurrentUser('id') userId: string,
+    @Body(new ValidationPipe(ChangePasswordSchema)) data: ChangePasswordDto,
+  ) {
+    await this.authService.changePassword(userId, data);
+    return apiResponse({
+      message: 'Password changed successfully',
+    });
   }
 }

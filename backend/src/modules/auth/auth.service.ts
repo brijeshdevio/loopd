@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   UnauthorizedException,
@@ -9,6 +10,7 @@ import argon2 from 'argon2';
 import { PRISMA_CODES } from 'src/constants/prisma';
 import { PrismaService } from 'src/prisma/prisma.service';
 
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
@@ -135,5 +137,39 @@ export class AuthService {
       }
       throw error;
     }
+  }
+
+  async changePassword(userId: string, data: ChangePasswordDto) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException(
+        'You are not logged in or your session has expired. Please log in again.',
+      );
+    }
+
+    const isPasswordValid = await argon2.verify(
+      user.password,
+      data.currentPassword,
+    );
+
+    if (!isPasswordValid) {
+      throw new BadRequestException('Current password is incorrect.');
+    }
+
+    const hashPassword = await argon2.hash(data.newPassword);
+
+    await this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        password: hashPassword,
+      },
+    });
   }
 }
