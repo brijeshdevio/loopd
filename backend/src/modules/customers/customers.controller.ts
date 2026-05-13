@@ -75,4 +75,18 @@ export class CustomersController {
       message: 'Customer updated successfully',
     });
   }
+
+  @Get(':id')
+  async findCustomerById(
+    @CurrentUser('id') userId: string,
+    @Param('id') customerId: string,
+  ) {
+    const customer = await this.customersService.findCustomerById(
+      userId,
+      customerId,
+    );
+    return apiResponse({
+      data: customer,
+    });
+  }
 }

@@ -93,3 +93,7 @@ Content-Type: application/json
   "lastVisitDate": "2025-05-17",
   "notes": "Bought water purifier. May need filter replacement."
 }
+
+
+### Get customer
+GET {{base_url}}/customers/cmp2bokne0000mscpbm7vwwfy

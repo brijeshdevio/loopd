@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -151,5 +152,44 @@ export class CustomersService {
       }
       throw error;
     }
+  }
+
+  async findCustomerById(ownerId: string, customerId: string) {
+    const customer = await this.prisma.customer.findUnique({
+      where: {
+        id: customerId,
+        ownerId,
+      },
+      select: {
+        id: true,
+        name: true,
+        phone: true,
+        email: true,
+        lastVisitDate: true,
+        notes: true,
+        createdAt: true,
+        followUps: {
+          orderBy: { createdAt: 'desc' },
+          select: {
+            id: true,
+            scheduledAt: true,
+            status: true,
+            type: true,
+            priority: true,
+            completedAt: true,
+            outcomeNotes: true,
+            createdAt: true,
+          },
+        },
+      },
+    });
+
+    if (!customer) {
+      throw new ForbiddenException(
+        'You do not have permission to access this customer.',
+      );
+    }
+
+    return customer;
   }
 }
