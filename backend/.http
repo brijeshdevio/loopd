@@ -81,3 +81,15 @@ Content-Type: application/json
     "notes": "Ask about purifier interest"
   }
 }
+
+### Update customer
+PATCH {{base_url}}/customers/cmp2bokne0000mscpbm7vwwfy
+Content-Type: application/json
+
+{
+  "name": "Arjun",
+  "phone": "9812345678",
+  "email": "arjun@ex.com",
+  "lastVisitDate": "2025-05-17",
+  "notes": "Bought water purifier. May need filter replacement."
+}

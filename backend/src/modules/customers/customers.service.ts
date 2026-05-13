@@ -9,6 +9,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { FindCustomersQueryDto } from './dto/find-customers-query.dto';
+import { UpdateCustomerDto } from './dto/update-customer.dto';
 
 @Injectable()
 export class CustomersService {
@@ -94,6 +95,49 @@ export class CustomersService {
       }
 
       return customer;
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === PRISMA_CODES.CONFLICT) {
+          throw new ConflictException(`Phone number already exists.`);
+        }
+        if (error.code === PRISMA_CODES.NOT_FOUND) {
+          throw new UnauthorizedException(
+            'You are not logged in or your session has expired. Please log in again.',
+          );
+        }
+      }
+      throw error;
+    }
+  }
+
+  async updateCustomer(
+    ownerId: string,
+    customerId: string,
+    data: UpdateCustomerDto,
+  ) {
+    try {
+      return await this.prisma.customer.update({
+        where: {
+          id: customerId,
+          ownerId,
+        },
+        data: {
+          ownerId,
+          name: data.name,
+          phone: data.phone,
+          email: data.email,
+          lastVisitDate: data.lastVisitDate,
+          notes: data.notes,
+        },
+        select: {
+          id: true,
+          name: true,
+          phone: true,
+          email: true,
+          lastVisitDate: true,
+          updatedAt: true,
+        },
+      });
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === PRISMA_CODES.CONFLICT) {

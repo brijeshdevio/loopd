@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { apiResponse } from 'src/common/helper/api-response';
@@ -13,6 +22,10 @@ import {
   FindCustomersQueryDto,
   FindCustomersQuerySchema,
 } from './dto/find-customers-query.dto';
+import {
+  UpdateCustomerDto,
+  UpdateCustomerSchema,
+} from './dto/update-customer.dto';
 
 @Controller('customers')
 @UseGuards(JwtAuthGuard)
@@ -42,6 +55,24 @@ export class CustomersController {
     return apiResponse({
       data: customer,
       message: 'Customer added successfully',
+    });
+  }
+
+  @Patch(':id')
+  async updateCustomer(
+    @CurrentUser('id') userId: string,
+    @Param('id') customerId: string,
+    @Body(new ValidationPipe(UpdateCustomerSchema))
+    data: UpdateCustomerDto,
+  ) {
+    const customer = await this.customersService.updateCustomer(
+      userId,
+      customerId,
+      data,
+    );
+    return apiResponse({
+      data: customer,
+      message: 'Customer updated successfully',
     });
   }
 }
