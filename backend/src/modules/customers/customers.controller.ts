@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -87,6 +88,17 @@ export class CustomersController {
     );
     return apiResponse({
       data: customer,
+    });
+  }
+
+  @Delete(':id')
+  async deleteCustomer(
+    @CurrentUser('id') userId: string,
+    @Param('id') customerId: string,
+  ) {
+    await this.customersService.deleteCustomer(userId, customerId);
+    return apiResponse({
+      message: 'Customer deleted successfully',
     });
   }
 }

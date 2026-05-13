@@ -192,4 +192,28 @@ export class CustomersService {
 
     return customer;
   }
+
+  async deleteCustomer(ownerId: string, customerId: string) {
+    try {
+      await this.prisma.customer.update({
+        where: {
+          id: customerId,
+          ownerId,
+        },
+        data: {
+          deletedAt: new Date(),
+          isDeleted: true,
+        },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === PRISMA_CODES.NOT_FOUND) {
+          throw new ForbiddenException(
+            'You do not have permission to access this customer.',
+          );
+        }
+      }
+      throw error;
+    }
+  }
 }

@@ -97,3 +97,7 @@ Content-Type: application/json
 
 ### Get customer
 GET {{base_url}}/customers/cmp2bokne0000mscpbm7vwwfy
+
+
+### Delete customer
+DELETE {{base_url}}/customers/cmp2bokne0000mscpbm7vwwfy
