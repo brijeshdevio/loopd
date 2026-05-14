@@ -105,3 +105,7 @@ DELETE {{base_url}}/customers/cmp2bokne0000mscpbm7vwwfy
 
 ### Restore deleted customer
 PATCH {{base_url}}/customers/cmp2bokne0000mscpbm7vwwfy/restore
+
+
+### Find follow-ups
+GET {{base_url}}/follow-ups
