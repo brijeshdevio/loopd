@@ -101,4 +101,19 @@ export class CustomersController {
       message: 'Customer deleted successfully',
     });
   }
+
+  @Patch(':id/restore')
+  async restoreCustomer(
+    @CurrentUser('id') userId: string,
+    @Param('id') customerId: string,
+  ) {
+    const customer = await this.customersService.restoreCustomer(
+      userId,
+      customerId,
+    );
+    return apiResponse({
+      message: 'Customer restored successfully',
+      data: customer,
+    });
+  }
 }
