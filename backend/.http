@@ -109,3 +109,7 @@ PATCH {{base_url}}/customers/cmp2bokne0000mscpbm7vwwfy/restore
 
 ### Find follow-ups
 GET {{base_url}}/follow-ups
+
+
+### Find follow-up
+GET {{base_url}}/follow-ups/cmp2bole70001mscpnwfy2lux

@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { apiResponse } from 'src/common/helper/api-response';
@@ -26,5 +26,17 @@ export class FollowUpsController {
       query,
     );
     return apiResponse({ data: followUps, meta });
+  }
+
+  @Get(':id')
+  async findFollowUpById(
+    @CurrentUser('id') ownerId: string,
+    @Param('id') followUpId: string,
+  ) {
+    const followUp = await this.followUpsService.findFollowUpById(
+      ownerId,
+      followUpId,
+    );
+    return apiResponse({ data: followUp });
   }
 }
