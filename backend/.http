@@ -126,3 +126,13 @@ Content-Type: application/json
   "priority": "MEDIUM",
   "notes": "Check if filter replacement is needed"
 }
+
+
+### Update follow-up
+PATCH {{base_url}}/follow-ups/cmp74ekdz0001ytcpuhn8v612
+Content-Type: application/json
+
+{
+  "type": "VISIT",
+  "priority": "HIGH"
+}

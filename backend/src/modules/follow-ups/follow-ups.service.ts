@@ -5,6 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 import { CreateFollowUpDto } from './dto/create-follow-up.dto';
 import { FindFollowUpsQueryDto } from './dto/find-follow-up-query.dto';
+import { UpdateFollowUpDto } from './dto/update-follow-up.dto';
 
 @Injectable()
 export class FollowUpsService {
@@ -113,5 +114,44 @@ export class FollowUpsService {
       }
       throw error;
     }
+  }
+
+  async updateFollowUp(
+    ownerId: string,
+    followUpId: string,
+    data: UpdateFollowUpDto,
+  ) {
+    const followUp = await this.prisma.followUp.findUnique({
+      where: {
+        id: followUpId,
+        ownerId,
+      },
+    });
+
+    if (!followUp) {
+      throw new ForbiddenException(
+        'You do not have permission to access this follow up.',
+      );
+    }
+
+    if (followUp.status === 'DONE') {
+      throw new ForbiddenException('You cannot update a completed follow up.');
+    }
+
+    return await this.prisma.followUp.update({
+      where: {
+        id: followUpId,
+        ownerId,
+      },
+      data: { ...data },
+      select: {
+        id: true,
+        type: true,
+        status: true,
+        priority: true,
+        scheduledAt: true,
+        notes: true,
+      },
+    });
   }
 }

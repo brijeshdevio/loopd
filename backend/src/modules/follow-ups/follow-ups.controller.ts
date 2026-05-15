@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -20,6 +21,10 @@ import {
   FindFollowUpsQueryDto,
   FindFollowUpsQuerySchema,
 } from './dto/find-follow-up-query.dto';
+import {
+  UpdateFollowUpDto,
+  UpdateFollowUpSchema,
+} from './dto/update-follow-up.dto';
 import { FollowUpsService } from './follow-ups.service';
 
 @Controller('follow-ups')
@@ -61,6 +66,23 @@ export class FollowUpsController {
     return apiResponse({
       data: followUp,
       message: 'Follow-up added successfully',
+    });
+  }
+
+  @Patch(':id')
+  async updateFollowUp(
+    @CurrentUser('id') ownerId: string,
+    @Param('id') followUpId: string,
+    @Body(new ValidationPipe(UpdateFollowUpSchema)) data: UpdateFollowUpDto,
+  ) {
+    const followUp = await this.followUpsService.updateFollowUp(
+      ownerId,
+      followUpId,
+      data,
+    );
+    return apiResponse({
+      data: followUp,
+      message: 'Follow-up updated successfully',
     });
   }
 }
