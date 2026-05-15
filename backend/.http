@@ -113,3 +113,16 @@ GET {{base_url}}/follow-ups
 
 ### Find follow-up
 GET {{base_url}}/follow-ups/cmp2bole70001mscpnwfy2lux
+
+
+### Create follow-up
+POST {{base_url}}/follow-ups
+Content-Type: application/json
+
+{
+  "customerId": "cmp2bokne0000mscpbm7vwwfy",
+  "type": "CALL",
+  "scheduledAt": "2025-05-20T10:00:00.000Z",
+  "priority": "MEDIUM",
+  "notes": "Check if filter replacement is needed"
+}

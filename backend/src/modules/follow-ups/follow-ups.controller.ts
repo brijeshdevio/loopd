@@ -1,9 +1,21 @@
-import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { apiResponse } from 'src/common/helper/api-response';
 import { ValidationPipe } from 'src/common/pipes/validation.pipe';
 
+import {
+  CreateFollowUpDto,
+  CreateFollowUpSchema,
+} from './dto/create-follow-up.dto';
 import {
   FindFollowUpsQueryDto,
   FindFollowUpsQuerySchema,
@@ -38,5 +50,17 @@ export class FollowUpsController {
       followUpId,
     );
     return apiResponse({ data: followUp });
+  }
+
+  @Post()
+  async createFollowUp(
+    @CurrentUser('id') ownerId: string,
+    @Body(new ValidationPipe(CreateFollowUpSchema)) data: CreateFollowUpDto,
+  ) {
+    const followUp = await this.followUpsService.createFollowUp(ownerId, data);
+    return apiResponse({
+      data: followUp,
+      message: 'Follow-up added successfully',
+    });
   }
 }

@@ -1,6 +1,9 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
+import { PRISMA_CODES } from 'src/constants/prisma';
 import { PrismaService } from 'src/prisma/prisma.service';
 
+import { CreateFollowUpDto } from './dto/create-follow-up.dto';
 import { FindFollowUpsQueryDto } from './dto/find-follow-up-query.dto';
 
 @Injectable()
@@ -86,5 +89,29 @@ export class FollowUpsService {
       );
     }
     return followUp;
+  }
+
+  async createFollowUp(ownerId: string, data: CreateFollowUpDto) {
+    try {
+      return await this.prisma.followUp.create({
+        data: {
+          ownerId,
+          customerId: data.customerId,
+          type: data.type,
+          priority: data.priority,
+          scheduledAt: data.scheduledAt,
+          notes: data.notes,
+        },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === PRISMA_CODES.NOT_FOUND) {
+          throw new ForbiddenException(
+            'You do not have permission to access this customer.',
+          );
+        }
+      }
+      throw error;
+    }
   }
 }
