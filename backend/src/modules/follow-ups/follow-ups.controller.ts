@@ -23,6 +23,10 @@ import {
   FindFollowUpsQuerySchema,
 } from './dto/find-follow-up-query.dto';
 import {
+  RescheduleFollowUpDto,
+  RescheduleFollowUpSchema,
+} from './dto/reschedule-follow-up.dto';
+import {
   UpdateFollowUpDto,
   UpdateFollowUpSchema,
 } from './dto/update-follow-up.dto';
@@ -101,6 +105,21 @@ export class FollowUpsController {
     return apiResponse({
       data: { followUp, nextFollowUp },
       message: 'Follow-up done successfully',
+    });
+  }
+
+  @Patch(':id/reschedule')
+  async rescheduleFollowUp(
+    @CurrentUser('id') ownerId: string,
+    @Param('id') followUpId: string,
+    @Body(new ValidationPipe(RescheduleFollowUpSchema))
+    data: RescheduleFollowUpDto,
+  ) {
+    const { oldFollowUp, nextFollowUp } =
+      await this.followUpsService.rescheduleFollowUp(ownerId, followUpId, data);
+    return apiResponse({
+      data: { oldFollowUp, nextFollowUp },
+      message: 'Follow-up rescheduled successfully',
     });
   }
 }

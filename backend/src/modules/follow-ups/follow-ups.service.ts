@@ -6,6 +6,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateFollowUpDto } from './dto/create-follow-up.dto';
 import { DoneFollowUpDto } from './dto/done-follow-up.dto';
 import { FindFollowUpsQueryDto } from './dto/find-follow-up-query.dto';
+import { RescheduleFollowUpDto } from './dto/reschedule-follow-up.dto';
 import { UpdateFollowUpDto } from './dto/update-follow-up.dto';
 
 @Injectable()
@@ -211,6 +212,65 @@ export class FollowUpsService {
     });
     return {
       followUp: updatedFollowUp,
+      nextFollowUp,
+    };
+  }
+
+  async rescheduleFollowUp(
+    ownerId: string,
+    followUpId: string,
+    data: RescheduleFollowUpDto,
+  ) {
+    const followUp = await this.prisma.followUp.findUnique({
+      where: {
+        id: followUpId,
+        ownerId,
+      },
+    });
+
+    if (!followUp) {
+      throw new ForbiddenException(
+        'You do not have permission to access this follow up.',
+      );
+    }
+
+    if (followUp.status === 'DONE') {
+      throw new ForbiddenException('You cannot update a completed follow up.');
+    }
+
+    const oldFollowUp = await this.prisma.followUp.update({
+      where: {
+        id: followUpId,
+        ownerId,
+      },
+      data: { scheduledAt: data.scheduledAt, status: 'RESCHEDULED' },
+      select: {
+        id: true,
+        status: true,
+        scheduledAt: true,
+      },
+    });
+
+    const nextFollowUp = await this.prisma.followUp.create({
+      data: {
+        ownerId,
+        customerId: followUp.customerId,
+        parentFollowUpId: followUpId,
+        notes: data.notes,
+        scheduledAt: data.scheduledAt,
+      },
+      select: {
+        id: true,
+        type: true,
+        status: true,
+        scheduledAt: true,
+        parentFollowUpId: true,
+        notes: true,
+      },
+    });
+
+    return {
+      oldFollowUp,
       nextFollowUp,
     };
   }
