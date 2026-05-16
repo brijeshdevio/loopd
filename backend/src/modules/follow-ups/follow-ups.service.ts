@@ -4,6 +4,7 @@ import { PRISMA_CODES } from 'src/constants/prisma';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 import { CreateFollowUpDto } from './dto/create-follow-up.dto';
+import { DoneFollowUpDto } from './dto/done-follow-up.dto';
 import { FindFollowUpsQueryDto } from './dto/find-follow-up-query.dto';
 import { UpdateFollowUpDto } from './dto/update-follow-up.dto';
 
@@ -153,5 +154,64 @@ export class FollowUpsService {
         notes: true,
       },
     });
+  }
+
+  async doneFollowUp(
+    ownerId: string,
+    followUpId: string,
+    data: DoneFollowUpDto,
+  ) {
+    const followUp = await this.prisma.followUp.findUnique({
+      where: {
+        id: followUpId,
+        ownerId,
+      },
+    });
+
+    if (!followUp) {
+      throw new ForbiddenException(
+        'You do not have permission to access this follow up.',
+      );
+    }
+
+    if (followUp.status === 'DONE') {
+      throw new ForbiddenException('You cannot update a completed follow up.');
+    }
+
+    const updatedFollowUp = await this.prisma.followUp.update({
+      where: {
+        id: followUpId,
+        ownerId,
+      },
+      data: { outcomeNotes: data.outcomeNotes, status: 'DONE' },
+      select: {
+        id: true,
+        status: true,
+        completedAt: true,
+        outcomeNotes: true,
+      },
+    });
+
+    if (!data.nextFollowUp) {
+      return { followUp };
+    }
+
+    const nextFollowUp = await this.prisma.followUp.create({
+      data: {
+        ownerId,
+        customerId: followUp.customerId,
+        ...data.nextFollowUp,
+      },
+      select: {
+        id: true,
+        type: true,
+        status: true,
+        scheduledAt: true,
+      },
+    });
+    return {
+      followUp: updatedFollowUp,
+      nextFollowUp,
+    };
   }
 }

@@ -136,3 +136,18 @@ Content-Type: application/json
   "type": "VISIT",
   "priority": "HIGH"
 }
+
+
+### Done follow-up
+PATCH {{base_url}}/follow-ups/cmp74ekdz0001ytcpuhn8v612/done
+Content-Type: application/json
+
+{
+  "outcomeNotes": "Arjun confirmed, will come Saturday to buy purifier",
+  "nextFollowUp": {
+    "type": "VISIT",
+    "scheduledAt": "2025-05-20T11:00:00.000Z",
+    "priority": "HIGH",
+    "notes": "Confirm purifier purchase"
+  }
+}

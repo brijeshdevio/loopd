@@ -17,6 +17,7 @@ import {
   CreateFollowUpDto,
   CreateFollowUpSchema,
 } from './dto/create-follow-up.dto';
+import { DoneFollowUpDto, DoneFollowUpSchema } from './dto/done-follow-up.dto';
 import {
   FindFollowUpsQueryDto,
   FindFollowUpsQuerySchema,
@@ -83,6 +84,23 @@ export class FollowUpsController {
     return apiResponse({
       data: followUp,
       message: 'Follow-up updated successfully',
+    });
+  }
+
+  @Patch(':id/done')
+  async doneFollowUp(
+    @CurrentUser('id') ownerId: string,
+    @Param('id') followUpId: string,
+    @Body(new ValidationPipe(DoneFollowUpSchema)) data: DoneFollowUpDto,
+  ) {
+    const { followUp, nextFollowUp } = await this.followUpsService.doneFollowUp(
+      ownerId,
+      followUpId,
+      data,
+    );
+    return apiResponse({
+      data: { followUp, nextFollowUp },
+      message: 'Follow-up done successfully',
     });
   }
 }
