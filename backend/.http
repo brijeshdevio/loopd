@@ -161,3 +161,12 @@ Content-Type: application/json
   "scheduledAt": "2025-05-20T11:00:00.000Z",
   "notes": "Confirm purifier purchase"
 }
+
+
+### no-response follow-up
+PATCH {{base_url}}/follow-ups/cmp2bole70001mscpnwfy2lux/no-response
+Content-Type: application/json
+
+{
+  "outcomeNotes": "Called twice, no answer"
+}

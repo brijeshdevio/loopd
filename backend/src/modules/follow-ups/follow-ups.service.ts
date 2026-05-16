@@ -6,6 +6,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateFollowUpDto } from './dto/create-follow-up.dto';
 import { DoneFollowUpDto } from './dto/done-follow-up.dto';
 import { FindFollowUpsQueryDto } from './dto/find-follow-up-query.dto';
+import { NoResponseFollowUpDto } from './dto/no-response-follow-up.dto';
 import { RescheduleFollowUpDto } from './dto/reschedule-follow-up.dto';
 import { UpdateFollowUpDto } from './dto/update-follow-up.dto';
 
@@ -273,5 +274,46 @@ export class FollowUpsService {
       oldFollowUp,
       nextFollowUp,
     };
+  }
+
+  async noResponseFollowUp(
+    ownerId: string,
+    followUpId: string,
+    data: NoResponseFollowUpDto,
+  ) {
+    const followUp = await this.prisma.followUp.findUnique({
+      where: {
+        id: followUpId,
+        ownerId,
+      },
+    });
+
+    if (!followUp) {
+      throw new ForbiddenException(
+        'You do not have permission to access this follow up.',
+      );
+    }
+
+    if (followUp.status === 'DONE') {
+      throw new ForbiddenException('You cannot update a completed follow up.');
+    }
+
+    return await this.prisma.followUp.update({
+      where: {
+        ownerId,
+        id: followUpId,
+      },
+      data: {
+        outcomeNotes: data.outcomeNotes,
+        status: 'NO_RESPONSE',
+        completedAt: new Date(),
+      },
+      select: {
+        id: true,
+        status: true,
+        outcomeNotes: true,
+        completedAt: true,
+      },
+    });
   }
 }

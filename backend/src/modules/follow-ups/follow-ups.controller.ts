@@ -23,6 +23,10 @@ import {
   FindFollowUpsQuerySchema,
 } from './dto/find-follow-up-query.dto';
 import {
+  NoResponseFollowUpDto,
+  NoResponseFollowUpSchema,
+} from './dto/no-response-follow-up.dto';
+import {
   RescheduleFollowUpDto,
   RescheduleFollowUpSchema,
 } from './dto/reschedule-follow-up.dto';
@@ -120,6 +124,24 @@ export class FollowUpsController {
     return apiResponse({
       data: { oldFollowUp, nextFollowUp },
       message: 'Follow-up rescheduled successfully',
+    });
+  }
+
+  @Patch(':id/no-response')
+  async noResponseFollowUp(
+    @CurrentUser('id') ownerId: string,
+    @Param('id') followUpId: string,
+    @Body(new ValidationPipe(NoResponseFollowUpSchema))
+    data: NoResponseFollowUpDto,
+  ) {
+    const followUp = await this.followUpsService.noResponseFollowUp(
+      ownerId,
+      followUpId,
+      data,
+    );
+    return apiResponse({
+      data: followUp,
+      message: 'Follow-up marked as no response successfully',
     });
   }
 }
