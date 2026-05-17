@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { SubscriptionGuard } from 'src/common/guards/subscription.guard';
 import { apiResponse } from 'src/common/helper/api-response';
 import { ValidationPipe } from 'src/common/pipes/validation.pipe';
 
@@ -38,7 +39,7 @@ import {
 import { FollowUpsService } from './follow-ups.service';
 
 @Controller('follow-ups')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, SubscriptionGuard)
 export class FollowUpsController {
   constructor(private readonly followUpsService: FollowUpsService) {}
 

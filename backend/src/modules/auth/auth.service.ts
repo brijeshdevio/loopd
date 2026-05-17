@@ -53,6 +53,14 @@ export class AuthService {
           phone: true,
           shopName: true,
           shopCategory: true,
+          subscription: {
+            select: {
+              planType: true,
+              status: true,
+              trialStartedAt: true,
+              trialEndsAt: true,
+            },
+          },
         },
       });
     } catch (error) {
@@ -103,6 +111,16 @@ export class AuthService {
         avatarUrl: true,
         emailVerified: true,
         createdAt: true,
+        subscription: {
+          select: {
+            planType: true,
+            status: true,
+            trialStartedAt: true,
+            trialEndsAt: true,
+            currentPeriodStart: true,
+            currentPeriodEnd: true,
+          },
+        },
       },
     });
 

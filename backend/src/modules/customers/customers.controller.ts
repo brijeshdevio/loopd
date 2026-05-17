@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { SubscriptionGuard } from 'src/common/guards/subscription.guard';
 import { apiResponse } from 'src/common/helper/api-response';
 import { ValidationPipe } from 'src/common/pipes/validation.pipe';
 
@@ -29,7 +30,7 @@ import {
 } from './dto/update-customer.dto';
 
 @Controller('customers')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, SubscriptionGuard)
 export class CustomersController {
   constructor(private readonly customersService: CustomersService) {}
 
