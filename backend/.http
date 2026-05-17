@@ -174,3 +174,7 @@ Content-Type: application/json
 
 ### Delete follow-up
 DELETE {{base_url}}/follow-ups/cmp7x629d0000ntcp89tc263f
+
+
+### dashboard stats
+GET {{base_url}}/dashboard/stats
