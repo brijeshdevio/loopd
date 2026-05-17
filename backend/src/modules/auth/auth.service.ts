@@ -7,6 +7,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 import argon2 from 'argon2';
+import { addDays } from 'src/common/helper/date-helper';
 import { PRISMA_CODES } from 'src/constants/prisma';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -36,6 +37,14 @@ export class AuthService {
           phone: data.phone,
           shopName: data.shopName,
           shopCategory: data.shopCategory,
+          subscription: {
+            create: {
+              planType: 'FREE_TRIAL',
+              status: 'ACTIVE',
+              trialStartedAt: new Date(),
+              trialEndsAt: addDays(new Date(), 7),
+            },
+          },
         },
         select: {
           id: true,
