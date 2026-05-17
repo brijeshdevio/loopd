@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -143,5 +144,14 @@ export class FollowUpsController {
       data: followUp,
       message: 'Follow-up marked as no response successfully',
     });
+  }
+
+  @Delete(':id')
+  async deleteFollowUp(
+    @CurrentUser('id') ownerId: string,
+    @Param('id') followUpId: string,
+  ) {
+    await this.followUpsService.deleteFollowUp(ownerId, followUpId);
+    return apiResponse({ message: 'Follow-up deleted successfully' });
   }
 }

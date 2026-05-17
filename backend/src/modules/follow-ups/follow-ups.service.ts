@@ -316,4 +316,30 @@ export class FollowUpsService {
       },
     });
   }
+
+  async deleteFollowUp(ownerId: string, followUpId: string) {
+    const followUp = await this.prisma.followUp.findUnique({
+      where: {
+        id: followUpId,
+        ownerId,
+      },
+    });
+
+    if (!followUp) {
+      throw new ForbiddenException(
+        'You do not have permission to access this follow up.',
+      );
+    }
+
+    if (followUp.status === 'DONE') {
+      throw new ForbiddenException('You cannot delete a completed follow up.');
+    }
+
+    await this.prisma.followUp.delete({
+      where: {
+        id: followUpId,
+        ownerId,
+      },
+    });
+  }
 }

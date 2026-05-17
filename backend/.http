@@ -170,3 +170,7 @@ Content-Type: application/json
 {
   "outcomeNotes": "Called twice, no answer"
 }
+
+
+### Delete follow-up
+DELETE {{base_url}}/follow-ups/cmp7x629d0000ntcp89tc263f
