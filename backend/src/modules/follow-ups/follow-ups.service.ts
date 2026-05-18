@@ -96,6 +96,27 @@ export class FollowUpsService {
   }
 
   async createFollowUp(ownerId: string, data: CreateFollowUpDto) {
+    const subscription = await this.prisma.subscription.findUnique({
+      where: {
+        userId: ownerId,
+      },
+    });
+    if (
+      subscription?.planType === 'FREE_TRIAL' ||
+      subscription?.planType === 'STANDARD'
+    ) {
+      {
+        const count = await this.prisma.followUp.count({ where: { ownerId } });
+        if (count >= 400) {
+          throw new ForbiddenException({
+            success: false,
+            message:
+              'You have reached the limit of 200 follow ups. Please upgrade to Pro for unlimited follow ups.',
+          });
+        }
+      }
+    }
+
     try {
       return await this.prisma.followUp.create({
         data: {

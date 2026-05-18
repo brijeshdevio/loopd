@@ -65,6 +65,27 @@ export class CustomersService {
   }
 
   async createCustomer(ownerId: string, data: CreateCustomerDto) {
+    const subscription = await this.prisma.subscription.findUnique({
+      where: {
+        userId: ownerId,
+      },
+    });
+    if (
+      subscription?.planType === 'FREE_TRIAL' ||
+      subscription?.planType === 'STANDARD'
+    ) {
+      {
+        const count = await this.prisma.customer.count({ where: { ownerId } });
+        if (count >= 200) {
+          throw new ForbiddenException({
+            success: false,
+            message:
+              'You have reached the limit of 200 customers. Please upgrade to Pro for unlimited customers.',
+          });
+        }
+      }
+    }
+
     try {
       const customer = await this.prisma.customer.create({
         data: {
